@@ -42,11 +42,70 @@ class Food:
 
     pass
 
-def next_turn(new_direction):
-    pass
+def next_turn(snake, food):
+
+    x, y = snake.coordinates[0]
+
+    if direction == "up":
+        y -= SPACE_SIZE
+
+    elif direction == "down":
+        y += SPACE_SIZE
+
+    elif direction == "left":
+        x -= SPACE_SIZE
+
+    elif direction == "right":    
+        x += SPACE_SIZE
+
+    snake.coordinates.insert(0, (x, y)) # add new coordinates to the front of the snake
+
+    square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill = SNAKE_COLOR)
+    
+    snake.squares.insert(0, square) # add new square to the front of the snake
+
+    if x == food.coordinates[0] and y == food.coordinates[1]: # if the snake eats the food
+
+        global score 
+
+        score += 1
+
+        label.config(text = "Score: {}".format(score))
+
+        canvas.delete("food") # remove the old food
+
+        food = Food() # create new food
+
+    else:
+        del snake.coordinates[-1]
+
+    del snake.coordinates[-1] # remove the last coordinate
+
+    canvas.delete(snake.squares[-1]) # remove the last square
+
+    del snake.squares[-1] # remove the last square
+
+    window.after(SPEED, next_turn, snake, food)
 
 def change_direction(new_direction):
-    pass
+
+    global direction
+
+    if new_direction == 'left':
+        if direction != 'right': # this stops the snake from doing a 180 degree turn
+            direction = new_direction
+
+    elif new_direction == 'right':
+        if direction != 'left':
+            direction = new_direction
+
+    elif new_direction == 'up':
+        if direction != 'down':
+            direction = new_direction
+
+    elif new_direction == 'down':
+        if direction != 'up':
+            direction = new_direction
 
 def check_collisions():
     pass
@@ -78,8 +137,15 @@ y = int((screen_width/2 - window_width/2))
 
 window.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
+window.bind("<Left>", lambda event: change_direction('left'))
+window.bind("<Right>", lambda event: change_direction('right'))
+window.bind("<Up>", lambda event: change_direction('up'))
+window.bind("<Down>", lambda event: change_direction('down')) # bind the arrow keys to the change_direction function
+
 food = Food()
 snake = Snake()
+
+next_turn(snake, food)
 
 window.mainloop()
 
