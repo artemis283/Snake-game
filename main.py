@@ -5,9 +5,9 @@ import random
 # Constants
 GAME_WIDTH = 700
 GAME_HEIGHT = 700
-SPEED = 50
-SPACE_SIZE = 50
-BODY_PARTS = 3
+SPEED = 75
+SPACE_SIZE = 25
+BODY_PARTS = 2
 SNAKE_COLOR = "#6A005C"
 FOOD_COLOR = "#FFFFFF"
 BACKGROUND_COLOR = "#EA8BFD"
@@ -27,6 +27,7 @@ class Snake:
         for x, y in self.coordinates:
             square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill = SNAKE_COLOR, tag = "snake")
             self.squares.append(square)
+            canvas.itemconfig(square, fill=SNAKE_COLOR)
     pass
 
 class Food:
@@ -77,18 +78,19 @@ def next_turn(snake, food):
         food = Food() # create new food
 
     else:
-        del snake.coordinates[-1]
+        del snake.coordinates[-1] # remove the last coordinate
 
-    del snake.coordinates[-1] # remove the last coordinate
+        canvas.delete(snake.squares[-1]) # remove the last square
 
-    canvas.delete(snake.squares[-1]) # remove the last square
+        del snake.squares[-1] # remove the last square
 
-    del snake.squares[-1] # remove the last square
+    if check_collisions(snake):
+        game_over()
 
-    window.after(SPEED, next_turn, snake, food)
+    else:
+        window.after(SPEED, next_turn, snake, food)
 
 def change_direction(new_direction):
-
     global direction
 
     if new_direction == 'left':
@@ -107,10 +109,26 @@ def change_direction(new_direction):
         if direction != 'up':
             direction = new_direction
 
-def check_collisions():
-    pass
+def check_collisions(snake):
+
+    x, y = snake.coordinates[0]
+
+    if x < 0 or x >= GAME_WIDTH:
+        return True
+    
+    elif y < 0 or y >= GAME_HEIGHT:
+        return True
+    
+    for body_part in snake.coordinates[1:]:
+        if x == body_part[0] and y == body_part[1]:
+            print("GAME OVER")
+            return True
+        
+    return False
 
 def game_over():
+    canvas.delete(ALL)
+    canvas.create_text(canvas.winfo_width()/2, canvas.winfo_height()/2, font = ('arial', 70), text = "GAME OVER", fill = "red", tag = "gameover")
     pass
 
 window = Tk()
