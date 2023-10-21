@@ -5,7 +5,7 @@ import random
 # Constants
 GAME_WIDTH = 700
 GAME_HEIGHT = 700
-SPEED = 75
+SPEED = 95
 SPACE_SIZE = 25
 BODY_PARTS = 2
 SNAKE_COLOR = "#6A005C"
